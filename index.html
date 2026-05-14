@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>恋愛クイズ</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #ffe1ec, #fff7fb);
+      color: #333;
+      text-align: center;
+    }
+
+    header {
+      background: #ff6f9f;
+      color: white;
+      padding: 25px 10px;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 30px auto;
+      background: white;
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .ad {
+      max-width: 720px;
+      margin: 20px auto;
+      padding: 10px;
+      background: #fff;
+      border-radius: 12px;
+    }
+
+    .question {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 25px;
+    }
+
+    .choices button {
+      display: block;
+      width: 100%;
+      margin: 12px 0;
+      padding: 15px;
+      font-size: 17px;
+      border: none;
+      border-radius: 12px;
+      background: #ffe4ee;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .choices button:hover {
+      background: #ffb6cf;
+    }
+
+    .correct {
+      background: #9be7a1 !important;
+    }
+
+    .wrong {
+      background: #ff9b9b !important;
+    }
+
+    #result {
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 20px;
+      min-height: 30px;
+    }
+
+    .score {
+      margin-top: 15px;
+      font-size: 16px;
+    }
+
+    .restart {
+      margin-top: 25px;
+      padding: 14px 25px;
+      font-size: 17px;
+      border: none;
+      border-radius: 30px;
+      background: #ff6f9f;
+      color: white;
+      cursor: pointer;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>恋愛クイズ</h1>
+  <p>恋愛心理・デート・告白・相性に関するクイズ</p>
+</header>
+
+<div class="ad">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8398161859137802"
+     crossorigin="anonymous"></script>
+  <!-- チェス -->
+  <ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-8398161859137802"
+     data-ad-slot="5599163841"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+  <script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<div class="container">
+  <div id="quizArea">
+    <div class="score" id="progress"></div>
+    <div class="question" id="question"></div>
+    <div class="choices" id="choices"></div>
+    <div id="result"></div>
+  </div>
+
+  <button class="restart" id="restartBtn" onclick="restartQuiz()">もう一度遊ぶ</button>
+</div>
+
+<script>
+const quizData = [
+  {
+    question: "初対面の印象で特に大切だと言われるものは？",
+    choices: ["清潔感", "高級な服", "早口で話す", "自慢話"],
+    answer: "清潔感"
+  },
+  {
+    question: "恋愛で相手に安心感を与えやすい行動は？",
+    choices: ["話を最後まで聞く", "すぐ否定する", "連絡を無視する", "駆け引きばかりする"],
+    answer: "話を最後まで聞く"
+  },
+  {
+    question: "デート中に好印象になりやすい行動は？",
+    choices: ["スマホばかり見る", "相手の話に興味を持つ", "店員に横柄にする", "遅刻して謝らない"],
+    answer: "相手の話に興味を持つ"
+  },
+  {
+    question: "告白のタイミングとして比較的よいのは？",
+    choices: ["相手が疲れている時", "関係が少し深まった時", "初対面の直後", "怒っている時"],
+    answer: "関係が少し深まった時"
+  },
+  {
+    question: "恋愛で信頼を失いやすい行動は？",
+    choices: ["約束を守る", "嘘をつく", "感謝を伝える", "相談に乗る"],
+    answer: "嘘をつく"
+  },
+  {
+    question: "長続きしやすいカップルの特徴は？",
+    choices: ["感謝を伝える", "全部相手任せ", "すぐ比較する", "不満をため続ける"],
+    answer: "感謝を伝える"
+  },
+  {
+    question: "相手に好意を自然に伝える言葉としてよいのは？",
+    choices: ["一緒にいると楽しい", "なんで返信遅いの？", "元恋人の方がよかった", "もっと完璧にして"],
+    answer: "一緒にいると楽しい"
+  },
+  {
+    question: "デート前に気をつけたい基本は？",
+    choices: ["清潔感を整える", "寝坊する", "予定を確認しない", "無言で遅れる"],
+    answer: "清潔感を整える"
+  },
+  {
+    question: "恋愛で大切なコミュニケーションは？",
+    choices: ["一方的に話す", "相手の気持ちを確認する", "無視する", "試すような言動をする"],
+    answer: "相手の気持ちを確認する"
+  },
+  {
+    question: "相手が落ち込んでいる時に良い対応は？",
+    choices: ["すぐ説教する", "気持ちを受け止める", "笑って流す", "話を遮る"],
+    answer: "気持ちを受け止める"
+  },
+  {
+    question: "恋愛で距離を縮める自然な方法は？",
+    choices: ["共通の話題を増やす", "毎日しつこく迫る", "相手の予定を勝手に決める", "嫉妬させる"],
+    answer: "共通の話題を増やす"
+  },
+  {
+    question: "付き合う前に大切なのは？",
+    choices: ["相手の価値観を知る", "すぐ結婚を迫る", "束縛する", "相手を試し続ける"],
+    answer: "相手の価値観を知る"
+  },
+  {
+    question: "返信が遅い時のよい考え方は？",
+    choices: ["相手にも都合がある", "嫌われたと決めつける", "何十通も送る", "怒る"],
+    answer: "相手にも都合がある"
+  },
+  {
+    question: "恋愛で重く見られやすい行動は？",
+    choices: ["相手の自由を尊重する", "返信を強要する", "感謝する", "話を聞く"],
+    answer: "返信を強要する"
+  },
+  {
+    question: "初デートで避けた方がよい話題は？",
+    choices: ["趣味", "好きな食べ物", "過度な過去の恋愛話", "休日の過ごし方"],
+    answer: "過度な過去の恋愛話"
+  },
+  {
+    question: "相手に信頼されやすい人の特徴は？",
+    choices: ["言動が一致している", "気分で約束を破る", "秘密をばらす", "嘘が多い"],
+    answer: "言動が一致している"
+  },
+  {
+    question: "恋愛で相性を見る時に大切なのは？",
+    choices: ["価値観", "服の値段だけ", "SNSのフォロワー数だけ", "見栄だけ"],
+    answer: "価値観"
+  },
+  {
+    question: "ケンカした後に大切な行動は？",
+    choices: ["謝るべき所は謝る", "無視し続ける", "相手だけ責める", "話し合いを避ける"],
+    answer: "謝るべき所は謝る"
+  },
+  {
+    question: "恋愛で好印象な褒め方は？",
+    choices: ["具体的に褒める", "上から目線で褒める", "他人と比べる", "からかい続ける"],
+    answer: "具体的に褒める"
+  },
+  {
+    question: "デートの予定を決める時に良いのは？",
+    choices: ["相手の希望も聞く", "全部勝手に決める", "直前まで放置する", "相手に丸投げする"],
+    answer: "相手の希望も聞く"
+  },
+  {
+    question: "恋愛で大切な距離感とは？",
+    choices: ["相手の時間も尊重する", "常に監視する", "全部把握しようとする", "束縛する"],
+    answer: "相手の時間も尊重する"
+  },
+  {
+    question: "相手の話を聞く時の良い姿勢は？",
+    choices: ["相づちを打つ", "途中で否定する", "スマホを見る", "話題を奪う"],
+    answer: "相づちを打つ"
+  },
+  {
+    question: "恋愛でマンネリを防ぐ方法は？",
+    choices: ["新しい体験を一緒にする", "会話をやめる", "感謝を忘れる", "予定を立てない"],
+    answer: "新しい体験を一緒にする"
+  },
+  {
+    question: "相手に安心される連絡の仕方は？",
+    choices: ["無理のない頻度で返す", "既読無視をわざと続ける", "怒りながら送る", "相手を責める"],
+    answer: "無理のない頻度で返す"
+  },
+  {
+    question: "恋愛で大切な自己管理は？",
+    choices: ["清潔感と生活リズム", "相手に全部依存", "予定をすべて相手中心", "自分を大切にしない"],
+    answer: "清潔感と生活リズム"
+  },
+  {
+    question: "相手が喜びやすい小さな行動は？",
+    choices: ["ありがとうを伝える", "当たり前だと思う", "無視する", "感謝しない"],
+    answer: "ありがとうを伝える"
+  },
+  {
+    question: "恋愛で避けたい考え方は？",
+    choices: ["相手を所有物のように見る", "相手を尊重する", "話し合う", "感謝する"],
+    answer: "相手を所有物のように見る"
+  },
+  {
+    question: "好きな人との会話で大切なのは？",
+    choices: ["質問と共感のバランス", "自分の話だけ", "沈黙を責める", "否定ばかり"],
+    answer: "質問と共感のバランス"
+  },
+  {
+    question: "恋愛で信頼関係を作る基本は？",
+    choices: ["約束を守る", "嘘を重ねる", "急に消える", "秘密を広める"],
+    answer: "約束を守る"
+  },
+  {
+    question: "良い関係を続けるために大切なのは？",
+    choices: ["思いやり", "支配", "無関心", "比較"],
+    answer: "思いやり"
+  }
+];
+
+let currentQuestion = 0;
+let score = 0;
+let answered = false;
+
+const questionEl = document.getElementById("question");
+const choicesEl = document.getElementById("choices");
+const resultEl = document.getElementById("result");
+const progressEl = document.getElementById("progress");
+const restartBtn = document.getElementById("restartBtn");
+
+function loadQuestion() {
+  answered = false;
+  resultEl.textContent = "";
+
+  const q = quizData[currentQuestion];
+
+  progressEl.textContent = `${currentQuestion + 1} / ${quizData.length}問目　正解数：${score}`;
+  questionEl.textContent = q.question;
+  choicesEl.innerHTML = "";
+
+  q.choices.forEach(choice => {
+    const btn = document.createElement("button");
+    btn.textContent = choice;
+    btn.onclick = () => checkAnswer(btn, choice);
+    choicesEl.appendChild(btn);
+  });
+}
+
+function checkAnswer(button, choice) {
+  if (answered) return;
+  answered = true;
+
+  const correctAnswer = quizData[currentQuestion].answer;
+  const buttons = choicesEl.querySelectorAll("button");
+
+  buttons.forEach(btn => {
+    btn.disabled = true;
+    if (btn.textContent === correctAnswer) {
+      btn.classList.add("correct");
+    }
+  });
+
+  if (choice === correctAnswer) {
+    score++;
+    resultEl.textContent = "正解！";
+    button.classList.add("correct");
+  } else {
+    resultEl.textContent = `不正解… 正解は「${correctAnswer}」`;
+    button.classList.add("wrong");
+  }
+
+  setTimeout(() => {
+    currentQuestion++;
+
+    if (currentQuestion < quizData.length) {
+      loadQuestion();
+    } else {
+      showFinalResult();
+    }
+  }, 1200);
+}
+
+function showFinalResult() {
+  questionEl.textContent = "クイズ終了！";
+  choicesEl.innerHTML = "";
+  resultEl.innerHTML = `あなたの正解数は <strong>${score} / ${quizData.length}</strong> 問です。`;
+  progressEl.textContent = "";
+  restartBtn.style.display = "inline-block";
+}
+
+function restartQuiz() {
+  currentQuestion = 0;
+  score = 0;
+  restartBtn.style.display = "none";
+  loadQuestion();
+}
+
+loadQuestion();
+</script>
+
+</body>
+</html>
